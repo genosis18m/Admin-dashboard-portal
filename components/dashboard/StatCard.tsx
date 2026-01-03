@@ -1,22 +1,29 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { LucideIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEffect, useState } from "react";
+import { Package, DollarSign, TrendingUp } from "lucide-react";
 
 interface StatCardProps {
   title: string;
   value: string | number;
   description: string;
-  icon: LucideIcon;
+  icon: "Package" | "DollarSign" | "TrendingUp";
   gradient: string;
   delay: number;
 }
 
-export function StatCard({ title, value, description, icon: Icon, gradient, delay }: StatCardProps) {
+const iconMap = {
+  Package,
+  DollarSign,
+  TrendingUp,
+};
+
+export function StatCard({ title, value, description, icon, gradient, delay }: StatCardProps) {
   const [count, setCount] = useState(0);
   const numericValue = typeof value === 'string' ? parseFloat(value.replace(/[^0-9.]/g, '')) : value;
+  const Icon = iconMap[icon];
 
   useEffect(() => {
     if (typeof numericValue === 'number' && !isNaN(numericValue)) {

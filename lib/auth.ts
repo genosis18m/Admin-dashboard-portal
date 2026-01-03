@@ -11,57 +11,72 @@ const loginSchema = z.object({
   password: z.string().min(6),
 });
 
+// Build providers array conditionally
+const providers = [
+  Credentials({
+    credentials: {
+      email: { label: "Email", type: "email" },
+      password: { label: "Password", type: "password" },
+    },
+    async authorize(credentials) {
+      const validated = loginSchema.safeParse(credentials);
+      
+      if (!validated.success) {
+        return null;
+      }
+
+      const { email, password } = validated.data;
+
+      const user = await prisma.user.findUnique({
+        where: { email },
+      });
+
+      if (!user || !user.password) {
+        return null;
+      }
+
+      const passwordsMatch = await bcrypt.compare(password, user.password);
+
+      if (!passwordsMatch) {
+        return null;
+      }
+
+      return {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      };
+    },
+  }),
+];
+
+// Only add Google if credentials exist
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  providers.push(
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    })
+  );
+}
+
+// Only add Facebook if credentials exist
+if (process.env.FACEBOOK_CLIENT_ID && process.env.FACEBOOK_CLIENT_SECRET) {
+  providers.push(
+    Facebook({
+      clientId: process.env.FACEBOOK_CLIENT_ID,
+      clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+    })
+  );
+}
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   session: { strategy: "jwt" },
   pages: {
     signIn: "/login",
   },
-  providers: [
-    Google({
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    }),
-    Facebook({
-      clientId: process.env.FACEBOOK_CLIENT_ID,
-      clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-    }),
-    Credentials({
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
-      },
-      async authorize(credentials) {
-        const validated = loginSchema.safeParse(credentials);
-        
-        if (!validated.success) {
-          return null;
-        }
-
-        const { email, password } = validated.data;
-
-        const user = await prisma.user.findUnique({
-          where: { email },
-        });
-
-        if (!user || !user.password) {
-          return null;
-        }
-
-        const passwordsMatch = await bcrypt.compare(password, user.password);
-
-        if (!passwordsMatch) {
-          return null;
-        }
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-        };
-      },
-    }),
-  ],
+  providers,
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
@@ -80,4 +95,4 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
 });
 
-export { handlers as GET, handlers as POST };
+export const { GET, POST } = handlers;

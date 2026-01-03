@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/db";
-import { Package, DollarSign, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { OverviewChart } from "@/components/charts/OverviewChart";
 import { StatCard } from "@/components/dashboard/StatCard";
@@ -47,7 +46,7 @@ export default async function DashboardPage() {
           title="Total Products"
           value={totalProducts}
           description="Active products in inventory"
-          icon={Package}
+          icon="Package"
           gradient="from-blue-600 to-blue-400"
           delay={0}
         />
@@ -55,7 +54,7 @@ export default async function DashboardPage() {
           title="Total Stock"
           value={totalStock}
           description="Units across all products"
-          icon={TrendingUp}
+          icon="TrendingUp"
           gradient="from-purple-600 to-purple-400"
           delay={0.1}
         />
@@ -63,7 +62,7 @@ export default async function DashboardPage() {
           title="Total Value"
           value={`$${Number(totalValue).toFixed(2)}`}
           description="Combined inventory value"
-          icon={DollarSign}
+          icon="DollarSign"
           gradient="from-pink-600 to-pink-400"
           delay={0.2}
         />
