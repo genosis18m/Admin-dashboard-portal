@@ -2,11 +2,22 @@ import { prisma } from "@/lib/db";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { OverviewChart } from "@/components/charts/OverviewChart";
 import { StatCard } from "@/components/dashboard/StatCard";
+import { auth } from "@/lib/auth";
 
 export default async function DashboardPage() {
-  const totalProducts = await prisma.product.count();
+  const session = await auth();
+  const userId = session?.user?.id;
+
+  if (!userId) {
+    return <div>Unauthorized</div>;
+  }
+
+  const totalProducts = await prisma.product.count({
+    where: { userId },
+  });
   
   const aggregateData = await prisma.product.aggregate({
+    where: { userId },
     _sum: {
       stock: true,
       price: true,
@@ -17,6 +28,7 @@ export default async function DashboardPage() {
   const totalValue = aggregateData._sum.price || 0;
 
   const products = await prisma.product.findMany({
+    where: { userId },
     take: 10,
     select: {
       name: true,

@@ -2,24 +2,31 @@
 
 import { deleteProduct } from "@/actions/product-actions";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
-import { useState } from "react";
+import { Trash2, Loader2 } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export function DeleteButton({ productId }: { productId: string }) {
-  const [isDeleting, setIsDeleting] = useState(false);
+  const queryClient = useQueryClient();
 
-  const handleDelete = async () => {
-    if (!confirm("Are you sure you want to delete this product?")) {
-      return;
-    }
+  const { mutate: handleDelete, isPending } = useMutation({
+    mutationFn: async () => {
+      const result = await deleteProduct(productId);
+      if (!result.success) throw new Error(result.message);
+      return result;
+    },
+    onSuccess: (data) => {
+      toast.success(data.message);
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to delete product");
+    },
+  });
 
-    setIsDeleting(true);
-    try {
-      await deleteProduct(productId);
-    } catch (error) {
-      alert("Failed to delete product");
-    } finally {
-      setIsDeleting(false);
+  const confirmDelete = () => {
+    if (confirm("Are you sure you want to delete this product?")) {
+      handleDelete();
     }
   };
 
@@ -27,10 +34,15 @@ export function DeleteButton({ productId }: { productId: string }) {
     <Button
       variant="destructive"
       size="sm"
-      onClick={handleDelete}
-      disabled={isDeleting}
+      onClick={confirmDelete}
+      disabled={isPending}
+      className="shadow-sm hover:shadow-md transition-all"
     >
-      <Trash2 className="h-4 w-4" />
+      {isPending ? (
+        <Loader2 className="h-4 w-4 animate-spin" />
+      ) : (
+        <Trash2 className="h-4 w-4" />
+      )}
     </Button>
   );
 }

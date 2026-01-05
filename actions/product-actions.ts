@@ -18,8 +18,15 @@ const productSchema = z.object({
   image: z.string().url("Image must be a valid URL").optional().or(z.literal("")),
 });
 
+import { auth } from "@/lib/auth";
+
 export async function createProduct(formData: FormData) {
   try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return { success: false, message: "Unauthorized" };
+    }
+
     const rawData = {
       name: formData.get("name") as string,
       description: formData.get("description") as string,
@@ -41,6 +48,7 @@ export async function createProduct(formData: FormData) {
         stock: parseInt(validatedData.stock),
         categoryId: validatedData.categoryId,
         image: validatedData.image || null,
+        userId: session.user.id,
       },
     });
 
@@ -58,6 +66,21 @@ export async function createProduct(formData: FormData) {
 
 export async function deleteProduct(id: string) {
   try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return { success: false, message: "Unauthorized" };
+    }
+
+    // Verify ownership
+    const product = await prisma.product.findUnique({
+      where: { id },
+      select: { userId: true },
+    });
+
+    if (!product || product.userId !== session.user.id) {
+      return { success: false, message: "Unauthorized to delete this product" };
+    }
+
     await prisma.product.delete({
       where: { id },
     });
@@ -73,6 +96,21 @@ export async function deleteProduct(id: string) {
 
 export async function updateProduct(id: string, formData: FormData) {
   try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return { success: false, message: "Unauthorized" };
+    }
+
+    // Verify ownership
+    const product = await prisma.product.findUnique({
+      where: { id },
+      select: { userId: true },
+    });
+
+    if (!product || product.userId !== session.user.id) {
+      return { success: false, message: "Unauthorized to update this product" };
+    }
+
     const rawData = {
       name: formData.get("name") as string,
       description: formData.get("description") as string,
