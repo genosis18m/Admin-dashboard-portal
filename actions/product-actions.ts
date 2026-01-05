@@ -28,6 +28,26 @@ export async function createProduct(formData: FormData) {
       return { success: false, message: "Unauthorized: Please log in again" };
     }
 
+    // Debug: Log the session user ID
+    console.log("🔍 DEBUG: Session user ID:", session.user.id);
+    console.log("🔍 DEBUG: Session user email:", session.user.email);
+
+    // Verify user exists in database
+    const userExists = await prisma.user.findUnique({
+      where: { id: session.user.id },
+    });
+
+    console.log("🔍 DEBUG: User exists in DB:", !!userExists);
+
+    if (!userExists) {
+      console.error("❌ ERROR: User ID from session not found in database!");
+      console.error("Session ID:", session.user.id);
+      return { 
+        success: false, 
+        message: "User account not found. Please log out and log in again." 
+      };
+    }
+
     const rawData = {
       name: (formData.get("name") as string) || "",
       description: (formData.get("description") as string) || "",
@@ -48,12 +68,8 @@ export async function createProduct(formData: FormData) {
         price: validatedData.price,
         stock: parseInt(validatedData.stock),
         image: validatedData.image || null,
-        user: {
-          connect: { id: session.user.id }
-        },
-        category: {
-          connect: { id: validatedData.categoryId }
-        }
+        userId: session.user.id,
+        categoryId: validatedData.categoryId,
       },
     });
 
