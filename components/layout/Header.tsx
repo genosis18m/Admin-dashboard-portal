@@ -1,7 +1,6 @@
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,20 +10,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { LogOut, User, Moon, Sun } from "lucide-react";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "@/components/theme-provider";
 import { motion } from "framer-motion";
 
-interface HeaderProps {
-  user: {
-    name?: string | null;
-    email?: string | null;
-    image?: string | null;
-  };
-}
-
-export function Header({ user }: HeaderProps) {
+export function Header() {
+  const { data: session } = useSession();
   const router = useRouter();
   const { theme, toggleTheme } = useTheme();
 
@@ -33,8 +25,8 @@ export function Header({ user }: HeaderProps) {
     router.push("/login");
   };
 
-  const userInitials = user?.name
-    ? user.name
+  const userInitials = session?.user?.name
+    ? session.user.name
         .split(" ")
         .map((n) => n[0])
         .join("")
@@ -42,18 +34,40 @@ export function Header({ user }: HeaderProps) {
     : "U";
 
   return (
-
+    <header className="sticky top-0 z-40 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
+      <div className="flex h-16 items-center justify-between px-4 md:px-8">
         <div className="flex items-center gap-4">
+          <h2 className="text-lg md:text-xl font-bold text-gradient-teal">
+            Admin Dashboard
+          </h2>
+        </div>
+
+        <div className="flex items-center gap-2 md:gap-3">
+          {/* Compact Theme Toggle */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={toggleTheme}
+            className="h-9 w-9 rounded-lg bg-muted hover:bg-muted/80 flex items-center justify-center transition-colors"
+            aria-label="Toggle theme"
+          >
+            {theme === "dark" ? (
+              <Sun className="h-4 w-4 text-orange-500" />
+            ) : (
+              <Moon className="h-4 w-4 text-teal-600" />
+            )}
+          </motion.button>
+
           <DropdownMenu>
             <DropdownMenuTrigger className="focus:outline-none">
-              <div className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-gray-100 transition-colors">
+              <div className="flex items-center gap-2 md:gap-3 rounded-lg px-2 md:px-3 py-2 hover:bg-muted transition-colors">
                 <div className="text-right hidden sm:block">
-                  <p className="text-sm font-medium">{session?.user?.name || "User"}</p>
+                  <p className="text-sm font-medium text-foreground">{session?.user?.name || "User"}</p>
                   <p className="text-xs text-muted-foreground">{session?.user?.email}</p>
                 </div>
-                <Avatar className="h-10 w-10 border-2 border-gradient-to-br from-blue-600 to-purple-600">
+                <Avatar className="h-9 w-9 border-2 border-teal-500">
                   <AvatarImage src={session?.user?.image || ""} />
-                  <AvatarFallback className="bg-gradient-to-br from-blue-600 to-purple-600 text-white">
+                  <AvatarFallback className="gradient-teal text-white font-semibold">
                     {userInitials}
                   </AvatarFallback>
                 </Avatar>
@@ -66,12 +80,8 @@ export function Header({ user }: HeaderProps) {
                 <User className="mr-2 h-4 w-4" />
                 <span>Profile</span>
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Settings className="mr-2 h-4 w-4" />
-                <span>Settings</span>
-              </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleSignOut} className="text-red-600">
+              <DropdownMenuItem onClick={handleSignOut} className="text-red-600 dark:text-red-400">
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>
               </DropdownMenuItem>

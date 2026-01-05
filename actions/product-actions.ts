@@ -70,3 +70,43 @@ export async function deleteProduct(id: string) {
     return { success: false, message: "Failed to delete product" };
   }
 }
+
+export async function updateProduct(id: string, formData: FormData) {
+  try {
+    const rawData = {
+      name: formData.get("name") as string,
+      description: formData.get("description") as string,
+      price: formData.get("price") as string,
+      stock: formData.get("stock") as string,
+      categoryId: formData.get("categoryId") as string,
+      image: formData.get("image") as string,
+    };
+
+    // Validate with Zod
+    const validatedData = productSchema.parse(rawData);
+
+    // Update product in database
+    await prisma.product.update({
+      where: { id },
+      data: {
+        name: validatedData.name,
+        description: validatedData.description || null,
+        price: parseFloat(validatedData.price),
+        stock: parseInt(validatedData.stock),
+        categoryId: validatedData.categoryId,
+        image: validatedData.image || null,
+      },
+    });
+
+    revalidatePath("/products");
+    revalidatePath("/dashboard");
+    revalidatePath(`/products/${id}/edit`);
+
+    return { success: true, message: "Product updated successfully" };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return { success: false, message: error.errors[0].message };
+    }
+    return { success: false, message: "Failed to update product" };
+  }
+}

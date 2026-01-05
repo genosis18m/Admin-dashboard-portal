@@ -98,7 +98,14 @@ export default async function ProductsPage() {
                         </span>
                       </td>
                       <td className="px-4 py-4">
-                        <DeleteButton productId={product.id} />
+                        <div className="flex items-center gap-2">
+                          <Link href={`/products/${product.id}/edit`}>
+                            <Button variant="outline" size="sm" className="hover:bg-teal-50 dark:hover:bg-teal-950/30 hover:border-teal-400">
+                              Edit
+                            </Button>
+                          </Link>
+                          <DeleteButton productId={product.id} />
+                        </div>
                       </td>
                     </tr>
                   ))}

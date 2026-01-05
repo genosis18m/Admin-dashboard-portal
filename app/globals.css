@@ -96,6 +96,11 @@
     -moz-osx-font-smoothing: grayscale;
   }
   
+  body.dark {
+    background: linear-gradient(to bottom right, hsl(220, 26%, 14%), hsl(220, 26%, 16%));
+    min-height: 100vh;
+  }
+  
   h1, h2, h3, h4, h5, h6 {
     @apply font-bold tracking-tight;
   }
