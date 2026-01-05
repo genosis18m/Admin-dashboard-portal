@@ -1,7 +1,7 @@
 "use client";
 
-import { auth } from "@/lib/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,21 +10,31 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, User, Settings } from "lucide-react";
-import { signOut, useSession } from "next-auth/react";
+import { LogOut, User, Moon, Sun } from "lucide-react";
+import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useTheme } from "@/components/theme-provider";
+import { motion } from "framer-motion";
 
-export function Header() {
-  const { data: session } = useSession();
+interface HeaderProps {
+  user: {
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+  };
+}
+
+export function Header({ user }: HeaderProps) {
   const router = useRouter();
+  const { theme, toggleTheme } = useTheme();
 
   const handleSignOut = async () => {
     await signOut({ redirect: false });
     router.push("/login");
   };
 
-  const userInitials = session?.user?.name
-    ? session.user.name
+  const userInitials = user?.name
+    ? user.name
         .split(" ")
         .map((n) => n[0])
         .join("")
@@ -32,13 +42,6 @@ export function Header() {
     : "U";
 
   return (
-    <header className="sticky top-0 z-40 border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
-      <div className="flex h-16 items-center justify-between px-8">
-        <div className="flex items-center gap-4">
-          <h2 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Admin Dashboard
-          </h2>
-        </div>
 
         <div className="flex items-center gap-4">
           <DropdownMenu>

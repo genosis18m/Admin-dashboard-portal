@@ -33,13 +33,13 @@ export default async function DashboardPage() {
   }));
 
   return (
-    <div className="min-h-screen p-8">
+    <div className="min-h-screen p-8 page-transition">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-gradient-purple mb-2">
+        <h1 className="text-4xl font-bold text-gradient-teal mb-2">
           Dashboard Overview
         </h1>
-        <p className="text-gray-600">Welcome back! Here's what's happening with your store today.</p>
+        <p className="text-muted-foreground">Welcome back! Here's what's happening with your store today.</p>
       </div>
 
       {/* Stats Grid */}
@@ -49,7 +49,7 @@ export default async function DashboardPage() {
           value={totalProducts}
           description="Active products in inventory"
           icon="Package"
-          gradient="gradient-purple"
+          gradient="gradient-teal"
           delay={0}
           change="+12.5% from last month"
         />
@@ -58,7 +58,7 @@ export default async function DashboardPage() {
           value={totalStock}
           description="Units across all products"
           icon="TrendingUp"
-          gradient="gradient-blue"
+          gradient="gradient-orange"
           delay={0.1}
           change="+8.2% from last month"
         />
@@ -67,7 +67,7 @@ export default async function DashboardPage() {
           value={`$${Number(totalValue).toFixed(2)}`}
           description="Combined inventory value"
           icon="DollarSign"
-          gradient="gradient-pink"
+          gradient="gradient-purple"
           delay={0.2}
           change="+15.3% from last month"
         />

@@ -1,99 +1,101 @@
 "use client";
 
-import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { Moon, Sun, Monitor, Bell, Lock, User, Palette } from "lucide-react";
+import { Moon, Sun, Bell, Palette } from "lucide-react";
 import { motion } from "framer-motion";
+import { useTheme } from "@/components/theme-provider";
+import { useState } from "react";
 
 export default function SettingsPage() {
-  const [theme, setTheme] = useState<"light" | "dark" | "system">("light");
-  const [notifications, setNotifications] = useState(true);
-
-  const handleThemeChange = (newTheme: "light" | "dark" | "system") => {
-    setTheme(newTheme);
-    // In a real app, you'd apply the theme here
-    if (newTheme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  };
+  const { theme, setTheme } = useTheme();
+  const [emailNotifications, setEmailNotifications] = useState(true);
+  const [pushNotifications, setPushNotifications] = useState(false);
 
   return (
-    <div className="min-h-screen p-8">
+    <div className="min-h-screen p-6 md:p-10 page-transition max-w-7xl mx-auto">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold text-gradient-purple mb-2">Settings</h1>
-        <p className="text-gray-600">Manage your account settings and preferences</p>
+      <div className="mb-10">
+        <h1 className="text-4xl md:text-5xl font-bold text-gradient-teal mb-3">Settings</h1>
+        <p className="text-muted-foreground text-lg">Customize your dashboard experience</p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         {/* Appearance Settings */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0 }}
+          transition={{ delay: 0, duration: 0.4 }}
+          className="lg:col-span-2"
         >
-          <Card className="border-0 shadow-premium bg-white">
+          <Card className="border-0 shadow-premium bg-card h-full">
             <CardHeader>
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl gradient-purple flex items-center justify-center">
-                  <Palette className="h-5 w-5 text-white" />
+              <div className="flex items-center gap-4">
+                <div className="h-14 w-14 rounded-2xl gradient-teal flex items-center justify-center shadow-lg">
+                  <Palette className="h-7 w-7 text-white" />
                 </div>
                 <div>
-                  <CardTitle className="text-xl">Appearance</CardTitle>
-                  <CardDescription>Customize how the app looks</CardDescription>
+                  <CardTitle className="text-2xl">Appearance</CardTitle>
+                  <CardDescription className="text-base">Choose your preferred theme mode</CardDescription>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
               <div>
-                <Label className="text-sm font-semibold text-gray-700 mb-3 block">
+                <Label className="text-sm font-semibold mb-5 block text-foreground/80">
                   Theme Mode
                 </Label>
-                <div className="grid grid-cols-3 gap-3">
-                  <button
-                    onClick={() => handleThemeChange("light")}
-                    className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
+                <div className="grid grid-cols-2 gap-6">
+                  <motion.button
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={() => setTheme("light")}
+                    className={`flex flex-col items-center gap-4 p-8 rounded-2xl border-2 transition-all ${
                       theme === "light"
-                        ? "border-purple-500 bg-purple-50"
-                        : "border-gray-200 hover:border-purple-200"
+                        ? "border-teal-500 bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-teal-950/30 dark:to-cyan-950/30 shadow-xl"
+                        : "border-border hover:border-teal-300 dark:hover:border-teal-700 bg-muted/30"
                     }`}
                   >
-                    <Sun className={`h-5 w-5 ${theme === "light" ? "text-purple-600" : "text-gray-600"}`} />
-                    <span className={`text-xs font-medium ${theme === "light" ? "text-purple-700" : "text-gray-700"}`}>
-                      Light
-                    </span>
-                  </button>
-                  <button
-                    onClick={() => handleThemeChange("dark")}
-                    className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
+                    <div className={`p-4 rounded-2xl ${theme === "light" ? "gradient-teal shadow-lg" : "bg-muted"}`}>
+                      <Sun className={`h-8 w-8 ${theme === "light" ? "text-white" : "text-muted-foreground"}`} />
+                    </div>
+                    <div className="text-center">
+                      <span className={`block text-base font-semibold ${theme === "light" ? "text-teal-700 dark:text-teal-400" : "text-foreground"}`}>
+                        Light Mode
+                      </span>
+                      <span className="text-xs text-muted-foreground mt-1 block">
+                        Bright and clean
+                      </span>
+                    </div>
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={() => setTheme("dark")}
+                    className={`flex flex-col items-center gap-4 p-8 rounded-2xl border-2 transition-all ${
                       theme === "dark"
-                        ? "border-purple-500 bg-purple-50"
-                        : "border-gray-200 hover:border-purple-200"
+                        ? "border-teal-500 bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-teal-950/30 dark:to-cyan-950/30 shadow-xl"
+                        : "border-border hover:border-teal-300 dark:hover:border-teal-700 bg-muted/30"
                     }`}
                   >
-                    <Moon className={`h-5 w-5 ${theme === "dark" ? "text-purple-600" : "text-gray-600"}`} />
-                    <span className={`text-xs font-medium ${theme === "dark" ? "text-purple-700" : "text-gray-700"}`}>
-                      Dark
-                    </span>
-                  </button>
-                  <button
-                    onClick={() => handleThemeChange("system")}
-                    className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
-                      theme === "system"
-                        ? "border-purple-500 bg-purple-50"
-                        : "border-gray-200 hover:border-purple-200"
-                    }`}
-                  >
-                    <Monitor className={`h-5 w-5 ${theme === "system" ? "text-purple-600" : "text-gray-600"}`} />
-                    <span className={`text-xs font-medium ${theme === "system" ? "text-purple-700" : "text-gray-700"}`}>
-                      System
-                    </span>
-                  </button>
+                    <div className={`p-4 rounded-2xl ${theme === "dark" ? "gradient-teal shadow-lg" : "bg-muted"}`}>
+                      <Moon className={`h-8 w-8 ${theme === "dark" ? "text-white" : "text-muted-foreground"}`} />
+                    </div>
+                    <div className="text-center">
+                      <span className={`block text-base font-semibold ${theme === "dark" ? "text-teal-700 dark:text-teal-400" : "text-foreground"}`}>
+                        Dark Mode
+                      </span>
+                      <span className="text-xs text-muted-foreground mt-1 block">
+                        Easy on the eyes
+                      </span>
+                    </div>
+                  </motion.button>
                 </div>
+              </div>
+              <div className="pt-2 px-4 py-3 rounded-xl bg-muted/50 border border-border/50">
+                <p className="text-sm text-muted-foreground">
+                  💡 Your theme preference will be saved automatically and applied across all sessions
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -103,89 +105,65 @@ export default function SettingsPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
+          transition={{ delay: 0.1, duration: 0.4 }}
         >
-          <Card className="border-0 shadow-premium bg-white">
+          <Card className="border-0 shadow-premium bg-card h-full">
             <CardHeader>
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl gradient-blue flex items-center justify-center">
-                  <Bell className="h-5 w-5 text-white" />
+              <div className="flex items-center gap-4">
+                <div className="h-14 w-14 rounded-2xl gradient-orange flex items-center justify-center shadow-lg">
+                  <Bell className="h-7 w-7 text-white" />
                 </div>
                 <div>
-                  <CardTitle className="text-xl">Notifications</CardTitle>
-                  <CardDescription>Manage notification preferences</CardDescription>
+                  <CardTitle className="text-2xl">Notifications</CardTitle>
+                  <CardDescription className="text-base">Manage alerts</CardDescription>
                 </div>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50">
-                <div className="flex-1">
-                  <p className="font-medium text-gray-900">Email Notifications</p>
-                  <p className="text-sm text-gray-500">Receive updates via email</p>
+              <div className="flex items-center justify-between p-4 rounded-xl bg-muted/50 border border-border/50">
+                <div className="flex-1 pr-4">
+                  <p className="font-semibold text-foreground">Email Updates</p>
+                  <p className="text-sm text-muted-foreground mt-0.5">Product & inventory alerts</p>
                 </div>
-                <button
-                  onClick={() => setNotifications(!notifications)}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    notifications ? "gradient-purple" : "bg-gray-300"
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setEmailNotifications(!emailNotifications)}
+                  className={`relative inline-flex h-7 w-12 items-center rounded-full transition-all ${
+                    emailNotifications ? "gradient-teal shadow-lg" : "bg-muted-foreground/30"
                   }`}
                 >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                      notifications ? "translate-x-6" : "translate-x-1"
-                    }`}
+                  <motion.span
+                    layout
+                    className="inline-block h-5 w-5 transform rounded-full bg-white shadow-md"
+                    style={{
+                      x: emailNotifications ? 24 : 4,
+                    }}
+                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
                   />
-                </button>
+                </motion.button>
               </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* Account Settings */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <Card className="border-0 shadow-premium bg-white">
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl gradient-pink flex items-center justify-center">
-                  <User className="h-5 w-5 text-white" />
+              <div className="flex items-center justify-between p-4 rounded-xl bg-muted/50 border border-border/50">
+                <div className="flex-1 pr-4">
+                  <p className="font-semibold text-foreground">Push Alerts</p>
+                  <p className="text-sm text-muted-foreground mt-0.5">Instant notifications</p>
                 </div>
-                <div>
-                  <CardTitle className="text-xl">Account</CardTitle>
-                  <CardDescription>Manage your account details</CardDescription>
-                </div>
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setPushNotifications(!pushNotifications)}
+                  className={`relative inline-flex h-7 w-12 items-center rounded-full transition-all ${
+                    pushNotifications ? "gradient-teal shadow-lg" : "bg-muted-foreground/30"
+                  }`}
+                >
+                  <motion.span
+                    layout
+                    className="inline-block h-5 w-5 transform rounded-full bg-white shadow-md"
+                    style={{
+                      x: pushNotifications ? 24 : 4,
+                    }}
+                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                  />
+                </motion.button>
               </div>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Button variant="outline" className="w-full justify-start">
-                <User className="mr-2 h-4 w-4" />
-                Edit Profile
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                <Lock className="mr-2 h-4 w-4" />
-                Change Password
-              </Button>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* Danger Zone */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          <Card className="border-0 shadow-premium bg-white border-red-200">
-            <CardHeader>
-              <CardTitle className="text-xl text-red-600">Danger Zone</CardTitle>
-              <CardDescription>Irreversible actions</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button variant="destructive" className="w-full">
-                Delete Account
-              </Button>
             </CardContent>
           </Card>
         </motion.div>
