@@ -2,6 +2,14 @@
 
 A modern, full-featured admin dashboard for e-commerce management built with Next.js 15, TypeScript, Prisma, and NextAuth.
 
+## 🌐 Live Demo
+
+**Production**: [https://admin-dashboard-portal-cdc.vercel.app](https://admin-dashboard-portal-cdc.vercel.app)
+
+🔐 **Demo Credentials** (if needed):
+- Use Google OAuth to sign in
+- Or create your own account at `/register`
+
 ## ✨ Features
 
 ### 🔐 Authentication
@@ -276,6 +284,10 @@ model Product {
 
 ## 🚀 Production Deployment
 
+### Deployed on Vercel
+
+**Live Site**: [https://admin-dashboard-portal-cdc.vercel.app](https://admin-dashboard-portal-cdc.vercel.app)
+
 ### Build for Production
 
 ```bash
@@ -283,17 +295,44 @@ npm run build
 npm start
 ```
 
-### Environment Variables
+### Production Environment Variables
 
-Update production `.env`:
-- Generate secure `NEXTAUTH_SECRET`: `openssl rand -base64 32`
-- Use production database URL
-- Add production OAuth redirect URIs
+Set these in your Vercel dashboard:
+
+```env
+# Database (Neon PostgreSQL)
+DATABASE_URL="your-neon-database-url"
+
+# NextAuth
+NEXTAUTH_SECRET="generate-with-openssl-rand-base64-32"
+NEXTAUTH_URL="https://admin-dashboard-portal-cdc.vercel.app"
+
+# Google OAuth
+GOOGLE_CLIENT_ID="your-google-client-id"
+GOOGLE_CLIENT_SECRET="your-google-client-secret"
+
+# Cloudinary (optional)
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME="your-cloud-name"
+CLOUDINARY_API_KEY="your-api-key"
+CLOUDINARY_API_SECRET="your-api-secret"
+```
+
+### Google OAuth Production Setup
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
+2. Add production redirect URIs:
+   ```
+   https://admin-dashboard-portal-cdc.vercel.app/api/auth/callback/google
+   ```
+3. Add authorized JavaScript origin:
+   ```
+   https://admin-dashboard-portal-cdc.vercel.app
+   ```
 
 ### Deployment Platforms
 
 Compatible with:
-- Vercel (recommended)
+- **Vercel** ✅ (currently deployed)
 - Railway
 - Render
 - Heroku
