@@ -63,7 +63,6 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  adapter: PrismaAdapter(prisma) as any,
   session: { strategy: "jwt" },
   pages: {
     signIn: "/login",
@@ -72,23 +71,77 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     async signIn({ user, account }) {
       // Ensure user exists in database (important for OAuth providers with JWT strategy)
-      if (user.email) {
-        const existingUser = await prisma.user.findUnique({
-          where: { email: user.email },
+      if (!user.email) {
+        return false;
+      }
+
+      const existingUser = await prisma.user.findUnique({
+        where: { email: user.email },
+      });
+      
+      // If user doesn't exist, create them
+      if (!existingUser) {
+        const newUser = await prisma.user.create({
+          data: {
+            id: user.id,
+            email: user.email,
+            name: user.name || null,
+            image: (user as any).image || null,
+          },
         });
         
-        // Only create user if they don't exist (OAuth users)
-        if (!existingUser) {
-          await prisma.user.create({
+        // Create the account link for OAuth
+        if (account && account.provider !== 'credentials') {
+          await prisma.account.create({
             data: {
-              id: user.id,
-              email: user.email,
-              name: user.name || null,
-              image: (user as any).image || null,
+              userId: newUser.id,
+              type: account.type,
+              provider: account.provider,
+              providerAccountId: account.providerAccountId,
+              refresh_token: account.refresh_token,
+              access_token: account.access_token,
+              expires_at: account.expires_at,
+              token_type: account.token_type,
+              scope: account.scope,
+              id_token: account.id_token,
+              session_state: account.session_state,
             },
           });
         }
+      } else {
+        // User exists - update the user ID to match the existing user
+        user.id = existingUser.id;
+        
+        // For OAuth providers, check if this specific provider account is already linked
+        if (account && account.provider !== 'credentials') {
+          const existingAccount = await prisma.account.findFirst({
+            where: {
+              provider: account.provider,
+              providerAccountId: account.providerAccountId,
+            },
+          });
+          
+          // If this specific OAuth account isn't linked yet, link it
+          if (!existingAccount) {
+            await prisma.account.create({
+              data: {
+                userId: existingUser.id,
+                type: account.type,
+                provider: account.provider,
+                providerAccountId: account.providerAccountId,
+                refresh_token: account.refresh_token,
+                access_token: account.access_token,
+                expires_at: account.expires_at,
+                token_type: account.token_type,
+                scope: account.scope,
+                id_token: account.id_token,
+                session_state: account.session_state,
+              },
+            });
+          }
+        }
       }
+      
       return true;
     },
     async jwt({ token, user }) {
