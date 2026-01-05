@@ -1,9 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useEffect, useState } from "react";
-import { Package, DollarSign, TrendingUp } from "lucide-react";
+import { Package, DollarSign, TrendingUp, ArrowUp } from "lucide-react";
 
 interface StatCardProps {
   title: string;
@@ -12,6 +12,7 @@ interface StatCardProps {
   icon: "Package" | "DollarSign" | "TrendingUp";
   gradient: string;
   delay: number;
+  change?: string;
 }
 
 const iconMap = {
@@ -20,7 +21,7 @@ const iconMap = {
   TrendingUp,
 };
 
-export function StatCard({ title, value, description, icon, gradient, delay }: StatCardProps) {
+export function StatCard({ title, value, description, icon, gradient, delay, change }: StatCardProps) {
   const [count, setCount] = useState(0);
   const numericValue = typeof value === 'string' ? parseFloat(value.replace(/[^0-9.]/g, '')) : value;
   const Icon = iconMap[icon];
@@ -55,28 +56,46 @@ export function StatCard({ title, value, description, icon, gradient, delay }: S
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.5 }}
-      whileHover={{ y: -5, transition: { duration: 0.2 } }}
+      whileHover={{ y: -8, transition: { duration: 0.2 } }}
+      className="group"
     >
-      <Card className="relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
-        <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-5`} />
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium text-gray-600">
-            {title}
-          </CardTitle>
+      <Card className="relative overflow-hidden border-0 shadow-premium hover:shadow-premium-lg transition-all duration-300 bg-white">
+        {/* Gradient overlay */}
+        <div className={`absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-300 ${gradient}`} />
+        
+        {/* Animated shimmer effect on hover */}
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="animate-shimmer absolute inset-0" />
+        </div>
+
+        <CardHeader className="flex flex-row items-center justify-between pb-2 relative z-10">
+          <div className="space-y-1">
+            <p className="text-sm font-medium text-gray-600">
+              {title}
+            </p>
+            {change && (
+              <div className="flex items-center gap-1 text-xs text-emerald-600 font-medium">
+                <ArrowUp className="h-3 w-3" />
+                <span>{change}</span>
+              </div>
+            )}
+          </div>
           <motion.div
-            whileHover={{ scale: 1.1, rotate: 5 }}
+            whileHover={{ scale: 1.1, rotate: 10 }}
             transition={{ type: "spring", stiffness: 300 }}
+            className="relative"
           >
-            <div className={`p-2 rounded-lg bg-gradient-to-br ${gradient}`}>
-              <Icon className="h-4 w-4 text-white" />
+            <div className={`absolute inset-0 blur-xl opacity-40 ${gradient}`} />
+            <div className={`relative p-3 rounded-2xl ${gradient} shadow-lg`}>
+              <Icon className="h-6 w-6 text-white" />
             </div>
           </motion.div>
         </CardHeader>
-        <CardContent>
-          <div className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+        <CardContent className="relative z-10">
+          <div className="text-3xl font-bold text-gradient-purple mb-1">
             {displayValue}
           </div>
-          <p className="text-xs text-gray-500 mt-1">{description}</p>
+          <p className="text-xs text-gray-500">{description}</p>
         </CardContent>
       </Card>
     </motion.div>

@@ -33,45 +33,63 @@ export default async function DashboardPage() {
   }));
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-          Dashboard
+    <div className="min-h-screen p-8">
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold text-gradient-purple mb-2">
+          Dashboard Overview
         </h1>
-        <p className="text-gray-500 mt-1">Welcome back! Here's an overview of your store.</p>
+        <p className="text-gray-600">Welcome back! Here's what's happening with your store today.</p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-3">
+      {/* Stats Grid */}
+      <div className="grid gap-6 md:grid-cols-3 mb-8">
         <StatCard
           title="Total Products"
           value={totalProducts}
           description="Active products in inventory"
           icon="Package"
-          gradient="from-blue-600 to-blue-400"
+          gradient="gradient-purple"
           delay={0}
+          change="+12.5% from last month"
         />
         <StatCard
           title="Total Stock"
           value={totalStock}
           description="Units across all products"
           icon="TrendingUp"
-          gradient="from-purple-600 to-purple-400"
+          gradient="gradient-blue"
           delay={0.1}
+          change="+8.2% from last month"
         />
         <StatCard
           title="Total Value"
           value={`$${Number(totalValue).toFixed(2)}`}
           description="Combined inventory value"
           icon="DollarSign"
-          gradient="from-pink-600 to-pink-400"
+          gradient="gradient-pink"
           delay={0.2}
+          change="+15.3% from last month"
         />
       </div>
 
-      <Card className="border-0 shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-xl">Stock Overview</CardTitle>
-          <p className="text-sm text-gray-500">Top 10 products by stock quantity</p>
+      {/* Chart Card */}
+      <Card className="border-0 shadow-premium bg-white">
+        <CardHeader className="pb-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-2xl font-bold text-gradient-purple">Stock Overview</CardTitle>
+              <p className="text-sm text-gray-500 mt-1">Top 10 products by stock quantity</p>
+            </div>
+            <div className="flex gap-2">
+              <button className="px-4 py-2 text-sm font-medium text-purple-700 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
+                This Week
+              </button>
+              <button className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
+                This Month
+              </button>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <OverviewChart data={chartData} />
