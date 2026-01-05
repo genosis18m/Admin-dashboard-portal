@@ -44,6 +44,21 @@ async function main() {
 
   console.log('✅ Categories created:', { electronics, clothing, books, home });
 
+  // Create a default admin user
+  const adminPassword = await import('bcryptjs').then(m => m.default.hash('admin123', 10));
+  const admin = await prisma.user.upsert({
+    where: { email: 'admin@example.com' },
+    update: {},
+    create: {
+      email: 'admin@example.com',
+      name: 'Admin User',
+      password: adminPassword,
+      role: 'ADMIN',
+    },
+  });
+
+  console.log('✅ Admin user created:', admin.email);
+
   // Create sample products
   const products = await Promise.all([
     prisma.product.upsert({
@@ -56,6 +71,7 @@ async function main() {
         price: 1299.99,
         stock: 15,
         categoryId: electronics.id,
+        userId: admin.id,
         image: 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=500',
       },
     }),
@@ -69,6 +85,7 @@ async function main() {
         price: 899.99,
         stock: 25,
         categoryId: electronics.id,
+        userId: admin.id,
         image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500',
       },
     }),
@@ -82,6 +99,7 @@ async function main() {
         price: 29.99,
         stock: 100,
         categoryId: clothing.id,
+        userId: admin.id,
         image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500',
       },
     }),
@@ -95,6 +113,7 @@ async function main() {
         price: 59.99,
         stock: 50,
         categoryId: clothing.id,
+        userId: admin.id,
         image: 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=500',
       },
     }),
@@ -108,6 +127,7 @@ async function main() {
         price: 24.99,
         stock: 30,
         categoryId: books.id,
+        userId: admin.id,
         image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=500',
       },
     }),
@@ -121,6 +141,7 @@ async function main() {
         price: 34.99,
         stock: 5,
         categoryId: home.id,
+        userId: admin.id,
         image: 'https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=500',
       },
     }),

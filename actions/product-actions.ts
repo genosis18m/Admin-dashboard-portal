@@ -23,32 +23,37 @@ import { auth } from "@/lib/auth";
 export async function createProduct(formData: FormData) {
   try {
     const session = await auth();
+    
     if (!session?.user?.id) {
-      return { success: false, message: "Unauthorized" };
+      return { success: false, message: "Unauthorized: Please log in again" };
     }
 
     const rawData = {
-      name: formData.get("name") as string,
-      description: formData.get("description") as string,
-      price: formData.get("price") as string,
-      stock: formData.get("stock") as string,
-      categoryId: formData.get("categoryId") as string,
-      image: formData.get("image") as string,
+      name: (formData.get("name") as string) || "",
+      description: (formData.get("description") as string) || "",
+      price: (formData.get("price") as string) || "",
+      stock: (formData.get("stock") as string) || "",
+      categoryId: (formData.get("categoryId") as string) || "",
+      image: (formData.get("image") as string) || "",
     };
 
     // Validate with Zod
     const validatedData = productSchema.parse(rawData);
 
     // Create product in database
-    await prisma.product.create({
+    const newProduct = await prisma.product.create({
       data: {
         name: validatedData.name,
         description: validatedData.description || null,
-        price: parseFloat(validatedData.price),
+        price: validatedData.price,
         stock: parseInt(validatedData.stock),
-        categoryId: validatedData.categoryId,
         image: validatedData.image || null,
-        userId: session.user.id,
+        user: {
+          connect: { id: session.user.id }
+        },
+        category: {
+          connect: { id: validatedData.categoryId }
+        }
       },
     });
 
@@ -56,11 +61,12 @@ export async function createProduct(formData: FormData) {
     revalidatePath("/dashboard");
 
     return { success: true, message: "Product created successfully" };
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof z.ZodError) {
-      return { success: false, message: error.errors[0].message };
+      return { success: false, message: `Validation Error: ${error.errors[0].message}` };
     }
-    return { success: false, message: "Failed to create product" };
+    
+    return { success: false, message: `System Error: ${error.message || "Unknown error occurred"}` };
   }
 }
 
