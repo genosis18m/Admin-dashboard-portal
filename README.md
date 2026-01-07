@@ -392,8 +392,6 @@ MIT License - Free for personal and commercial use
 
 ## 🤝 Connect
 
-Built with ❤️ by **Mohit Adoni**
-
 **GitHub**: [genosis18m](https://github.com/genosis18m)  
 **Project Repository**: [Admin-dashboard-portal](https://github.com/genosis18m/Admin-dashboard-portal)
 
